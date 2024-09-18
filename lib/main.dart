@@ -98,8 +98,8 @@ class _Login extends State<Login> {
                       padding: const EdgeInsets.symmetric(vertical: 20.0),
                       child: ElevatedButton(
                         onPressed: () {
-                          Navigator.pushNamed(context, '/login');
                           if (_formKey.currentState!.validate()) {
+                          Navigator.pushNamed(context, '/login');
                           }
                         },
                         child: const Text('Entrar'),
