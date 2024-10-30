@@ -82,6 +82,7 @@ class _LoginRegisterState extends State<LoginRegister> {
                     const SizedBox(height: 10),
                     TextFormField(
                       controller: _passwordController,
+                      obscureText: true,
                       decoration: InputDecoration(
                           labelText: "Senha",
                           labelStyle: TextStyle(color: Color.fromARGB(255, 69, 42, 16)),
