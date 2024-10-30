@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "436714118717",
+    "project_id": "letterbook-8c51f",
+    "storage_bucket": "letterbook-8c51f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:436714118717:android:2585670b2205665ce9d454",
+        "android_client_info": {
+          "package_name": "com.example.prova_flutte"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB3dgDuhD86GDO8cDdhBPpeUXimu-nSRwE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
