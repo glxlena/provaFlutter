@@ -5,6 +5,7 @@ import 'package:prova_flutter/firebase_options.dart';
 import 'package:prova_flutter/views/home_page.dart';
 import 'package:prova_flutter/views/inicio.dart';
 import 'package:prova_flutter/views/register.dart';
+import 'package:prova_flutter/views/form_page.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,30 +24,35 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: LoginPage(),
-      routes: {"/loginRegister": (context) => LoginRegister()},
+      home: MainPage(),
+      routes: {
+        '/loginRegister': (context) => LoginRegister(),
+        '/home': (context) => HomePage(user: FirebaseAuth.instance.currentUser!),
+        '/novoDiario': (context) => FormsDiario(),
+      },
     );
   }
 }
 
-class MainPage extends StatefulWidget{
+class MainPage extends StatefulWidget {
   const MainPage({super.key});
 
-  @override 
+  @override
   State<MainPage> createState() => _MainPageState();
 }
 
-class _MainPageState extends State<MainPage>{
-  @override 
+class _MainPageState extends State<MainPage> {
+  @override
   Widget build(BuildContext context) {
-    return StreamBuilder<User?>(stream: FirebaseAuth.instance.userChanges(), 
-    builder: (context, snapshot){
-      if(snapshot.hasData){
-        return HomePage(user: snapshot.data!);
-      }
-      else{
-        return LoginPage();
-      }
-    });
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.userChanges(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return HomePage(user: snapshot.data!);
+        } else {
+          return LoginPage();
+        }
+      },
+    );
   }
 }

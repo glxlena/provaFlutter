@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:prova_flutter/services/authentication_service.dart';
+import 'package:prova_flutter/views/home_page.dart';
 import 'package:prova_flutter/widgets/snack_bar_widget.dart';
 import 'package:prova_flutter/widgets/text_field_widget.dart';
 
@@ -79,18 +81,34 @@ class _LoginPageState extends State<LoginPage> {
                           if (_formKey.currentState?.validate() ?? false) {
                             String email = _emailController.text;
                             String password = _passwordController.text;
-                            _authService.loginUser(
-                              email: email, password: password).then((error) {
-                                if (error != null) {
-                                  snackBarWidget(
-                                    context: context, title: error, isError: true);
-                                }
-                              });
+
+                            String? error = await _authService.loginUser(email: email, password: password);
+
+                            if (error != null) {
+                              snackBarWidget(
+                                context: context,
+                                title: error,
+                                isError: true,
+                              );
+                            } else {
+                              // Obter o usuário autenticado
+                              User? user = FirebaseAuth.instance.currentUser;
+
+                              // Login bem-sucedido, redireciona para a homepage com o usuário
+                              if (user != null) {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => HomePage(user: user),
+                                  ),
+                                );
+                              }
+                            }
                           }
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Color.fromARGB(255, 69, 42, 16),
-                          foregroundColor: Colors.white, 
+                          foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                         ),
                         child: const Row(
@@ -99,8 +117,8 @@ class _LoginPageState extends State<LoginPage> {
                             Text('Entrar'),
                           ],
                         ),
-                      )
-,
+                      ),
+
                       TextButton(
                         child: const Text("Ainda não tem conta? Registre-se",
                         style: TextStyle(color: Color.fromARGB(255, 69, 42, 16)),),
