@@ -31,7 +31,13 @@ class _FormsDiarioState extends State<FormsDiario> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.diario != null ? 'Editar Pensamento' : 'Novo Pensamento')),
+      appBar: AppBar(
+        title: Text(widget.diario != null ? 'Editar Registro' : 'Novo Registro',
+        style: TextStyle(color: Colors.white),),
+        
+        backgroundColor: Color.fromARGB(255, 69, 42, 16),
+      ),
+      backgroundColor: Color.fromARGB(199, 242, 214, 196),
       body: Form(
         key: _formKey,
         child: Column(
@@ -48,7 +54,16 @@ class _FormsDiarioState extends State<FormsDiario> {
                 },
                 decoration: InputDecoration(
                   label: Text('Título'),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                  labelStyle: TextStyle(color: Color.fromARGB(255, 69, 42, 16)),
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide(color: Color.fromARGB(255, 69, 42, 16)),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Color.fromARGB(255, 69, 42, 16)),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Color.fromARGB(255, 69, 42, 16)),
+                          ),
                 ),
               ),
             ),
@@ -58,9 +73,24 @@ class _FormsDiarioState extends State<FormsDiario> {
                 controller: _descriptionController,
                 keyboardType: TextInputType.multiline,
                 maxLines: 4,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Por favor, faça um registro antes.';
+                  }
+                  return null;
+                },
                 decoration: InputDecoration(
                   label: Text('O que gostaria de registrar hoje?'),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                  labelStyle: TextStyle(color: Color.fromARGB(255, 69, 42, 16)),
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide(color: Color.fromARGB(255, 69, 42, 16)),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Color.fromARGB(255, 69, 42, 16)),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Color.fromARGB(255, 69, 42, 16)),
+                          ),
                 ),
               ),
             ),
@@ -88,30 +118,39 @@ class _FormsDiarioState extends State<FormsDiario> {
                 ],
               ),
             ),
-            ElevatedButton(
-              onPressed: () async {
-                if (_formKey.currentState!.validate()) {
-                  String title = _titleController.text;
-                  String description = _descriptionController.text;
+            Padding(
+              padding: EdgeInsets.all(10),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color.fromARGB(255, 69, 42, 16),
+                ),
+                onPressed: () async {
+                  if (_formKey.currentState!.validate()) {
+                    String title = _titleController.text;
+                    String description = _descriptionController.text;
 
-                  if (widget.diario != null) {
-                    await _diarioService.editDiario(
-                      widget.diario!.id!,
-                      title,
-                      description,
-                      _selectedDate,
-                    );
-                  } else {
-                    await _diarioService.saveDiario(
-                      title,
-                      description,
-                      _selectedDate,
-                    );
+                    if (widget.diario != null) {
+                      await _diarioService.editDiario(
+                        widget.diario!.id!,
+                        title,
+                        description,
+                        _selectedDate,
+                      );
+                    } else {
+                      await _diarioService.saveDiario(
+                        title,
+                        description,
+                        _selectedDate,
+                      );
+                    }
+                    Navigator.pop(context);
                   }
-                  Navigator.pop(context);
-                }
-              },
-              child: Text(widget.diario != null ? 'Alterar' : 'Salvar'),
+                },
+                child: Text(
+                  widget.diario != null ? 'Alterar' : 'Salvar',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
             ),
           ],
         ),

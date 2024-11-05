@@ -17,7 +17,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Tela Inicial',
+          'LetterBook: Diário Virtual',
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Color.fromARGB(255, 69, 42, 16),
@@ -65,19 +65,22 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               child: Text(
-                "O que você está pensando hoje?",
+                "Querido Diário...",
                 style: TextStyle(
                   color: Color.fromARGB(255, 255, 255, 255),
                   fontSize: 16,
                 ),
               ),
             ),
+            Spacer(),
             Align(
-              alignment: Alignment.bottomCenter,
+              alignment: Alignment.bottomRight,
               child: FloatingActionButton(
                 onPressed: () {
                   Navigator.pushNamed(context, '/novoDiario'); 
                 },
+                backgroundColor: Color.fromARGB(255, 69, 42, 16), // Cor do botão
+                foregroundColor: Colors.white, // Cor do ícone
                 child: Icon(Icons.add),
               ),
             ),
