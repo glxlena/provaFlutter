@@ -1,6 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:prova_flutter/models/diario_model.dart';
 import 'package:prova_flutter/services/authentication_service.dart';
+import 'package:prova_flutter/services/diario_services.dart';
+import 'package:prova_flutter/views/form_page.dart';
 
 class HomePage extends StatefulWidget {
   final User user;
@@ -12,6 +16,68 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final DiarioService _diarioService = DiarioService();
+
+  void _showBottomSheet(Diario diario) {
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+      ),
+      backgroundColor: Color.fromARGB(255, 242, 214, 196),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    diario.title,
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.edit, color: Color.fromARGB(255, 69, 42, 16)),
+                        onPressed: () {
+                          Navigator.pop(context); // Fechar a modal
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => FormsDiario(diario: diario),
+                            ),
+                          );
+                        },
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.delete, color: Colors.red),
+                        onPressed: () async {
+                          await _diarioService.deleteDiario(diario.id!);
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              SizedBox(height: 8),
+              Text(
+                'Data: ${diario.date.toLocal()}',
+                style: TextStyle(color: Colors.grey),
+              ),
+              SizedBox(height: 16),
+              Text(diario.description),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,16 +90,18 @@ class _HomePageState extends State<HomePage> {
       ),
       backgroundColor: Color.fromARGB(199, 242, 214, 196),
       drawer: Drawer(
+        backgroundColor: Color.fromARGB(199, 242, 214, 196),
         child: Column(
           children: [
             UserAccountsDrawerHeader(
+              decoration: BoxDecoration(
+                color: Color.fromARGB(255, 69, 42, 16),
+              ),
               accountName: Text(
-                widget.user.displayName != null
-                    ? widget.user.displayName!
-                    : "Não informado",
+                widget.user.displayName ?? "Não informado",
               ),
               accountEmail: Text(
-                widget.user.email != null ? widget.user.email! : "Não informado",
+                widget.user.email ?? "Não informado",
               ),
             ),
             ListTile(
@@ -41,7 +109,7 @@ class _HomePageState extends State<HomePage> {
               leading: Icon(Icons.logout),
               onTap: () async {
                 await AuthenticationService().logoutUser();
-                Navigator.pushReplacementNamed(context, '/'); 
+                Navigator.pushReplacementNamed(context, '/');
               },
             ),
           ],
@@ -67,20 +135,96 @@ class _HomePageState extends State<HomePage> {
               child: Text(
                 "Querido Diário...",
                 style: TextStyle(
-                  color: Color.fromARGB(255, 255, 255, 255),
+                  color: Colors.white,
                   fontSize: 16,
                 ),
               ),
             ),
-            Spacer(),
+            Expanded(
+              child: StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance.collection('diarios').snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  }
+
+                  if (snapshot.hasError) {
+                    return Center(child: Text("Erro ao carregar dados"));
+                  }
+
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    return Center(child: Text("Nenhum diário encontrado"));
+                  }
+
+                  var notes = snapshot.data!.docs;
+
+                  return GridView.builder(
+                    padding: const EdgeInsets.all(10.0),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 1 / 1.2,
+                      mainAxisSpacing: 10,
+                      crossAxisSpacing: 10,
+                    ),
+                    itemCount: notes.length,
+                    itemBuilder: (context, index) {
+                      final note = notes[index];
+                      String title = note['title'] ?? 'Sem Título';
+                      String description = note['description'] ?? 'Sem descrição';
+                      DateTime date = (note['date'] as Timestamp).toDate();
+
+                      Diario diario = Diario(
+                        id: note.id,
+                        title: title,
+                        description: description,
+                        date: date,
+                      );
+
+                      return GestureDetector(
+                        onTap: () {
+                          _showBottomSheet(diario);
+                        },
+                        child: Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  title,
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                SizedBox(height: 8),
+                                Text(
+                                  description.length > 50
+                                      ? description.substring(0, 50) + '...'
+                                      : description,
+                                ),
+                                SizedBox(height: 8),
+                                Text('Data: ${date.toLocal()}'),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
             Align(
               alignment: Alignment.bottomRight,
               child: FloatingActionButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, '/novoDiario'); 
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => FormsDiario(),
+                    ),
+                  );
                 },
-                backgroundColor: Color.fromARGB(255, 69, 42, 16), // Cor do botão
-                foregroundColor: Colors.white, // Cor do ícone
+                backgroundColor: Color.fromARGB(255, 69, 42, 16),
+                foregroundColor: Colors.white,
                 child: Icon(Icons.add),
               ),
             ),

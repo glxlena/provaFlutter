@@ -34,7 +34,6 @@ class _FormsDiarioState extends State<FormsDiario> {
       appBar: AppBar(
         title: Text(widget.diario != null ? 'Editar Registro' : 'Novo Registro',
         style: TextStyle(color: Colors.white),),
-        
         backgroundColor: Color.fromARGB(255, 69, 42, 16),
       ),
       backgroundColor: Color.fromARGB(199, 242, 214, 196),
@@ -100,7 +99,7 @@ class _FormsDiarioState extends State<FormsDiario> {
                 children: [
                   Text("Data: ${_selectedDate.toLocal()}"),
                   IconButton(
-                    icon: Icon(Icons.calendar_today),
+                    icon: Icon(Icons.calendar_today, color: Color.fromARGB(255, 69, 42, 16)),
                     onPressed: () async {
                       DateTime? picked = await showDatePicker(
                         context: context,
@@ -121,34 +120,29 @@ class _FormsDiarioState extends State<FormsDiario> {
             Padding(
               padding: EdgeInsets.all(10),
               child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color.fromARGB(255, 69, 42, 16),
-                ),
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
-                    String title = _titleController.text;
-                    String description = _descriptionController.text;
+                    final diario = Diario(
+                      id: widget.diario?.id,
+                      title: _titleController.text,
+                      description: _descriptionController.text,
+                      date: _selectedDate,
+                    );
 
                     if (widget.diario != null) {
-                      await _diarioService.editDiario(
-                        widget.diario!.id!,
-                        title,
-                        description,
-                        _selectedDate,
-                      );
+                      await _diarioService.atualizarDiario(diario.id!, diario.title, diario.description, diario.date,);
                     } else {
-                      await _diarioService.saveDiario(
-                        title,
-                        description,
-                        _selectedDate,
-                      );
+                      await _diarioService.adicionarDiario(diario.title, diario.description, diario.date);
                     }
+
                     Navigator.pop(context);
                   }
                 },
-                child: Text(
-                  widget.diario != null ? 'Alterar' : 'Salvar',
-                  style: TextStyle(color: Colors.white),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color.fromARGB(255, 69, 42, 16),
+                ),
+                child: Text(widget.diario != null ? 'Atualizar' : 'Salvar',
+                style: TextStyle(color: Colors.white),
                 ),
               ),
             ),
