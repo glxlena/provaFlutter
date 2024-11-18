@@ -2,124 +2,110 @@ import 'package:flutter/material.dart';
 import 'package:prova_flutter/models/diario_model.dart';
 import 'package:prova_flutter/services/diario_services.dart';
 
+
 class FormsDiario extends StatefulWidget {
   final Diario? diario;
 
-  const FormsDiario({super.key, this.diario});
+  FormsDiario({this.diario});
 
   @override
-  State<FormsDiario> createState() => _FormsDiarioState();
+  _FormsDiarioState createState() => _FormsDiarioState();
 }
 
 class _FormsDiarioState extends State<FormsDiario> {
   final _formKey = GlobalKey<FormState>();
-  final DiarioService _diarioService = DiarioService();
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
+  final _titleController = TextEditingController();
+  final _descriptionController = TextEditingController();
+  final _diarioService = DiarioService();
   DateTime _selectedDate = DateTime.now();
 
   @override
   void initState() {
+    super.initState();
     if (widget.diario != null) {
       _titleController.text = widget.diario!.title;
       _descriptionController.text = widget.diario!.description;
       _selectedDate = widget.diario!.date;
     }
-    super.initState();
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.diario != null ? 'Editar Registro' : 'Novo Registro',
-        style: TextStyle(color: Colors.white),),
         backgroundColor: Color.fromARGB(255, 69, 42, 16),
+        title: Text(widget.diario != null ? 'Editar Diário' : 'Novo Diário',
+        style: TextStyle(color: Colors.white),),
       ),
       backgroundColor: Color.fromARGB(199, 242, 214, 196),
-      body: Form(
-        key: _formKey,
-        child: Column(
-          children: [
-            Padding(
-              padding: EdgeInsets.all(10),
-              child: TextFormField(
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: <Widget>[
+              TextFormField(
                 controller: _titleController,
+                decoration: InputDecoration(
+                  labelText: 'Título',
+                  labelStyle: TextStyle(color: Color.fromARGB(255, 69, 42, 16)),
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Título não preenchido';
+                    return 'Por favor, insira o título';
                   }
                   return null;
                 },
-                decoration: InputDecoration(
-                  label: Text('Título'),
-                  labelStyle: TextStyle(color: Color.fromARGB(255, 69, 42, 16)),
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide(color: Color.fromARGB(255, 69, 42, 16)),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Color.fromARGB(255, 69, 42, 16)),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Color.fromARGB(255, 69, 42, 16)),
-                          ),
-                ),
               ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(10),
-              child: TextFormField(
+              TextFormField(
                 controller: _descriptionController,
-                keyboardType: TextInputType.multiline,
-                maxLines: 4,
+                decoration: InputDecoration(
+                  labelText: 'Querido Diário',
+                  labelStyle: TextStyle(color: Color.fromARGB(255, 69, 42, 16)),
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Por favor, faça um registro antes.';
+                    return 'Por favor, insira a descrição';
                   }
                   return null;
                 },
-                decoration: InputDecoration(
-                  label: Text('O que gostaria de registrar hoje?'),
-                  labelStyle: TextStyle(color: Color.fromARGB(255, 69, 42, 16)),
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide(color: Color.fromARGB(255, 69, 42, 16)),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Color.fromARGB(255, 69, 42, 16)),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Color.fromARGB(255, 69, 42, 16)),
-                          ),
-                ),
               ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(10),
-              child: Row(
+              SizedBox(height: 16.0),
+              Row(
                 children: [
-                  Text("Data: ${_selectedDate.toLocal()}"),
-                  IconButton(
-                    icon: Icon(Icons.calendar_today, color: Color.fromARGB(255, 69, 42, 16)),
-                    onPressed: () async {
-                      DateTime? picked = await showDatePicker(
-                        context: context,
-                        initialDate: _selectedDate,
-                        firstDate: DateTime(2000),
-                        lastDate: DateTime.now(),
-                      );
-                      if (picked != null && picked != _selectedDate) {
-                        setState(() {
-                          _selectedDate = picked;
-                        });
-                      }
-                    },
+                  Text(
+                    "Data: ${_selectedDate.toLocal()}".split(' ')[0],
+                    style: TextStyle(color: Color.fromARGB(255, 69, 42, 16)), 
+                  ),
+                  SizedBox(width: 20.0),
+                  ElevatedButton(
+                    onPressed: () => _selectDate(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color.fromARGB(255, 69, 42, 16), 
+                    ),
+                    child: Text(
+                      'Selecionar Data',
+                      style: TextStyle(color: Colors.white), 
+                    ),
                   ),
                 ],
               ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(10),
-              child: ElevatedButton(
+              SizedBox(height: 20.0),
+              ElevatedButton(
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
                     final diario = Diario(
@@ -127,26 +113,36 @@ class _FormsDiarioState extends State<FormsDiario> {
                       title: _titleController.text,
                       description: _descriptionController.text,
                       date: _selectedDate,
+                      userId: '',
                     );
 
                     if (widget.diario != null) {
-                      await _diarioService.atualizarDiario(diario.id!, diario.title, diario.description, diario.date,);
+                      await _diarioService.atualizarDiario(
+                        diario.id!,
+                        diario.title,
+                        diario.description,
+                        diario.date,
+                      );
                     } else {
-                      await _diarioService.adicionarDiario(diario.title, diario.description, diario.date);
+                      await _diarioService.adicionarDiario(
+                        diario.title,
+                        diario.description,
+                        diario.date,
+                      );
                     }
-
-                    Navigator.pop(context);
                   }
+                  Navigator.of(context).pushNamedAndRemoveUntil('/home', (route) => false);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color.fromARGB(255, 69, 42, 16),
                 ),
-                child: Text(widget.diario != null ? 'Atualizar' : 'Salvar',
-                style: TextStyle(color: Colors.white),
+                child: Text(
+                  widget.diario != null ? 'Atualizar' : 'Salvar',
+                  style: TextStyle(color: Colors.white),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

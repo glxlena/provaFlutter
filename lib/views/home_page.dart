@@ -44,7 +44,7 @@ class _HomePageState extends State<HomePage> {
                       IconButton(
                         icon: Icon(Icons.edit, color: Color.fromARGB(255, 69, 42, 16)),
                         onPressed: () {
-                          Navigator.pop(context); // Fechar a modal
+                          Navigator.pop(context);
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -142,7 +142,11 @@ class _HomePageState extends State<HomePage> {
             ),
             Expanded(
               child: StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance.collection('diarios').snapshots(),
+                stream: FirebaseFirestore.instance
+                  .collection('diarios')
+                  .where('userId', isEqualTo: widget.user.uid)
+                  .snapshots(),
+
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Center(child: CircularProgressIndicator());
@@ -178,6 +182,7 @@ class _HomePageState extends State<HomePage> {
                         title: title,
                         description: description,
                         date: date,
+                        userId: '',
                       );
 
                       return GestureDetector(

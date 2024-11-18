@@ -17,6 +17,7 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   AuthenticationService _authService = AuthenticationService();
+  bool _rememberMe = false;
 
   @override
   Widget build(BuildContext context) {
@@ -76,6 +77,21 @@ class _LoginPageState extends State<LoginPage> {
                         validator: (value) => requiredValidator(value, "a senha"),
                       ),
                       const SizedBox(height: 10),
+                      CheckboxListTile(
+                        title: const Text(
+                          "Lembre-me",
+                          style: TextStyle(color: Color.fromARGB(255, 69, 42, 16)),
+                        ),
+                        value: _rememberMe,
+                        onChanged: (newValue) {
+                          setState(() {
+                            _rememberMe = newValue ?? false;
+                          });
+                        },
+                        controlAffinity: ListTileControlAffinity.leading,
+                        activeColor: Color.fromARGB(255, 69, 42, 16),
+                      ),
+                      const SizedBox(height: 10),
                       ElevatedButton(
                         onPressed: () async {
                           if (_formKey.currentState?.validate() ?? false) {
@@ -91,10 +107,7 @@ class _LoginPageState extends State<LoginPage> {
                                 isError: true,
                               );
                             } else {
-                              // Obter o usuário autenticado
                               User? user = FirebaseAuth.instance.currentUser;
-
-                              // Login bem-sucedido, redireciona para a homepage com o usuário
                               if (user != null) {
                                 Navigator.pushReplacement(
                                   context,

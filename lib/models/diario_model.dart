@@ -5,8 +5,8 @@ class Diario {
   String title;
   String description;
   DateTime date;
-  String userId; // Novo campo para armazenar o ID do usuário
-
+  String userId; 
+  
   Diario({
     this.id,
     required this.title,
@@ -23,7 +23,7 @@ class Diario {
       date: map['date'] is Timestamp
           ? (map['date'] as Timestamp).toDate()
           : map['date'] as DateTime,
-      userId: map['userId'], // Recupera o userId do map
+      userId: map['userId'],
     );
   }
 
@@ -32,7 +32,7 @@ class Diario {
       'title': title,
       'description': description,
       'date': Timestamp.fromDate(date),
-      'userId': userId, // Adiciona o userId ao map
+      'userId': userId,
     };
   }
 }

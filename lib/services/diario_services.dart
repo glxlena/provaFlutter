@@ -13,7 +13,7 @@ class DiarioService {
       title: title,
       description: description,
       date: date,
-      userId: userId, // Associa o diário ao ID do usuário
+      userId: userId,
     );
     await _diarioCollection.add(diario.toMap());
   }
@@ -33,7 +33,6 @@ class DiarioService {
   }
 
   Stream<List<Diario>> getDiarios() {
-    // Busca apenas os diários associados ao usuário atual
     return _diarioCollection
         .where('userId', isEqualTo: userId)
         .snapshots()
